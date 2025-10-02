@@ -16,26 +16,26 @@ const store = {
 export const metadata: Metadata = {
   metadataBase: new URL(base),
   title: {
-    default: "AtYourService – Jobs in deiner Nähe. Sofort.",
+    default: "AtYourService – Jobs in deiner Nähe. 0% Provision.",
     template: "%s | AtYourService",
   },
   description:
-    "AtYourService verbindet Kunden und Dienstleister ohne Provisionen – fair, schnell und lokal.",
+    "AtYourService verbindet Kunden und Dienstleister in deiner Nähe – ohne Provisionen. Push für neue Aufträge, fair & lokal. iOS & Android.",
   keywords: [
-    "Dienstleister",
-    "Handwerker",
-    "Reinigung",
-    "Babysitter",
-    "lokale Jobs",
+    "Dienstleister finden",
     "Jobs in der Nähe",
-    "Aufträge",
+    "Handwerker App",
+    "Babysitter",
+    "Reinigung",
+    "Gartenarbeit",
+    "Aufträge ohne Provision",
     "0% Provision",
   ],
   alternates: {
     canonical: "/",
     languages: {
       de: "/",
-      nl: "/?lang=nl",
+      nl: "/?lang=nl", // später auf echte /nl-Route umstellen
     },
   },
   robots: {
@@ -47,12 +47,12 @@ export const metadata: Metadata = {
     type: "website",
     url: base,
     siteName: "AtYourService",
-    title: "AtYourService – Jobs in deiner Nähe. Sofort.",
+    title: "AtYourService – Jobs in deiner Nähe. 0% Provision.",
     description:
-      "Kunden & Dienstleister ohne Provisionen – fair, schnell und lokal.",
+      "Kunden & Dienstleister direkt verbinden – ohne Provision. Fair, schnell & lokal. iOS & Android.",
     images: [
       {
-        url: "/og.jpg", // Lege optional ein 1200x630 Bild unter /public/og.jpg ab
+        url: "/og.jpg", // optional: 1200x630 unter /public/og.jpg
         width: 1200,
         height: 630,
         alt: "AtYourService App",
@@ -61,13 +61,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AtYourService – Jobs in deiner Nähe. Sofort.",
+    title: "AtYourService – Jobs in deiner Nähe. 0% Provision.",
     description:
-      "AtYourService verbindet Kunden und Dienstleister ohne Provisionen – fair, schnell und lokal.",
+      "Kunden & Dienstleister ohne Provisionen – fair, schnell und lokal.",
     images: ["/og.jpg"],
   },
   icons: {
     icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png", // optional, falls vorhanden
   },
 };
 
