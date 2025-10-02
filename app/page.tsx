@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
-type Lang = 'de' | 'nl';
-
-const t: Record<Lang, any> = {
+/** Übersetzungen als konstantes Objekt (keine anys) */
+const t = {
   de: {
     nav_features: 'Features',
     nav_pricing: 'Preise',
@@ -25,7 +24,7 @@ const t: Record<Lang, any> = {
       ['Keine Provisionen', '0% Gebühren. Keine versteckten Kosten – fair und transparent.'],
       ['7 Sprachen', 'Die App passt sich automatisch an deine Gerätesprache an.'],
       ['First come, first served', 'Wer zuerst reagiert, hat die besten Chancen – nachvollziehbar.'],
-    ],
+    ] as [string, string][],
     note_title: 'Hinweis zum Start',
     note_body:
       'Wir rollen Städte schrittweise aus. Anfangs siehst du ggf. wenige oder keine Jobs – das ändert sich schnell.',
@@ -34,13 +33,13 @@ const t: Record<Lang, any> = {
       ['Free', '0€', 'immer', ['Jobs im Umkreis sehen', 'Push bei neuen Aufträgen', 'Basis-Profil']],
       ['Silber', '9,99€', 'Monat', ['Erweiterter Radius', 'Höhere Sichtbarkeit', 'Schnellere Benachrichtigungen']],
       ['Gold', '19,99€', 'Monat', ['Max. Radius & Priorität', 'Top-Platzierungen', 'Premium-Support']],
-    ],
+    ] as [string, string, string, string[]][],
     faq_title: 'FAQ',
     faqs: [
       ['Gibt es Provisionen?', 'Nein. Wir nehmen 0% – Preis & Zahlung klärt ihr direkt miteinander.'],
       ['Wie bekomme ich Jobs?', 'Push-Meldungen für neue Aufträge in deinem Radius. Wer zuerst reagiert, hat die besten Chancen.'],
       ['Wann startet meine Stadt?', 'Phasenweise Rollout. Trag dich ein – wir informieren dich, sobald deine Stadt live ist.'],
-    ],
+    ] as [string, string][],
     join_title: 'Früh dabei sein?',
     join_body:
       'Trag dich ein, wenn du Dienstleister bist – das Abo gilt nur für Dienstleister (Kunden brauchen kein Abo und nutzen die App kostenlos).',
@@ -75,7 +74,7 @@ const t: Record<Lang, any> = {
       ['Geen commissies', '0% kosten. Geen verborgen kosten – eerlijk en transparant.'],
       ['7 talen', 'De app past zich automatisch aan je toesteltaal aan.'],
       ['First come, first served', 'Wie eerst reageert, maakt de meeste kans – eenvoudig & eerlijk.'],
-    ],
+    ] as [string, string][],
     note_title: 'Opstartnotitie',
     note_body:
       'We rollen steden gefaseerd uit. In het begin zie je mogelijk weinig jobs – dat verandert snel.',
@@ -84,13 +83,13 @@ const t: Record<Lang, any> = {
       ['Free', '€0', 'altijd', ['Jobs in jouw straal', 'Push bij nieuwe opdrachten', 'Basisprofiel']],
       ['Zilver', '€9,99', 'maand', ['Grotere straal', 'Meer zichtbaarheid', 'Snellere meldingen']],
       ['Goud', '€19,99', 'maand', ['Max. straal & prioriteit', 'Top-posities', 'Premium support']],
-    ],
+    ] as [string, string, string, string[]][],
     faq_title: 'Veelgestelde vragen',
     faqs: [
       ['Zijn er commissies?', 'Nee. Wij nemen 0% – prijs & betaling regel je rechtstreeks met de klant.'],
       ['Hoe krijg ik jobs?', 'Pushmeldingen voor nieuwe opdrachten binnen jouw straal. Eerst reageren = meeste kans.'],
       ['Wanneer start mijn stad?', 'Gefaseerde uitrol. Schrijf je in – we laten het weten zodra jouw stad live is.'],
-    ],
+    ] as [string, string][],
     join_title: 'Als eerste erbij?',
     join_body:
       'Schrijf je in als je vakman bent – het abonnement is alleen voor vakmensen (klanten hebben geen abonnement en gebruiken de app gratis).',
@@ -105,7 +104,10 @@ const t: Record<Lang, any> = {
     btn_join_as_pro: 'Inschrijven als vakman',
     btn_join_as_customer: 'Inschrijven als klant',
   },
-};
+} as const;
+
+/** Sprachtyp direkt aus den Keys abgeleitet */
+type Lang = keyof typeof t;
 
 /* ---------- Stabiler Crossfade-Slider für Hochformat-Screens ---------- */
 function ScreenshotSlider({ shots }: { shots: { src: string; alt: string }[] }) {
@@ -173,10 +175,11 @@ export default function Home() {
   const [lang, setLang] = useState<Lang>('de');
   const tr = t[lang];
 
-  const featureIcons = ['📍','🔔','🤝','🛡️','🌐','⚡️'] as const;
+  const featureIcons = ['📍', '🔔', '🤝', '🛡️', '🌐', '⚡️'] as const;
 
   const store = {
-    android: 'https://play.google.com/store/apps/details?id=com.quinten.atyourservice&pcampaignid=web_share',
+    android:
+      'https://play.google.com/store/apps/details?id=com.quinten.atyourservice&pcampaignid=web_share',
     ios: 'https://apps.apple.com/be/app/atyourservice24/id6748581941',
   } as const;
 
@@ -200,10 +203,18 @@ export default function Home() {
             <span className="ml-2 rounded-full border px-2 py-0.5 text-xs">Beta</span>
           </div>
           <nav className="hidden sm:flex items-center gap-4 text-sm">
-            <a href="#features" className="hover:underline">{tr.nav_features}</a>
-            <a href="#pricing" className="hover:underline">{tr.nav_pricing}</a>
-            <a href="#faq" className="hover:underline">{tr.nav_faq}</a>
-            <a href="#join" className="ml-2 rounded-lg border px-3 py-1.5 hover:bg-slate-50">{tr.nav_join}</a>
+            <a href="#features" className="hover:underline">
+              {tr.nav_features}
+            </a>
+            <a href="#pricing" className="hover:underline">
+              {tr.nav_pricing}
+            </a>
+            <a href="#faq" className="hover:underline">
+              {tr.nav_faq}
+            </a>
+            <a href="#join" className="ml-2 rounded-lg border px-3 py-1.5 hover:bg-slate-50">
+              {tr.nav_join}
+            </a>
             <select
               value={lang}
               onChange={(e) => setLang(e.target.value as Lang)}
@@ -232,9 +243,7 @@ export default function Home() {
             <h1 className="text-5xl md:text-6xl font-extrabold leading-[1.05] tracking-tight text-slate-900">
               {tr.hero_title}
             </h1>
-            <p className="text-lg md:text-xl text-slate-700 mt-5 max-w-xl">
-              {tr.hero_sub}
-            </p>
+            <p className="text-lg md:text-xl text-slate-700 mt-5 max-w-xl">{tr.hero_sub}</p>
 
             <div className="flex flex-wrap gap-3 mt-8">
               <a
@@ -264,8 +273,17 @@ export default function Home() {
                 className="group inline-flex items-center gap-2 rounded-xl border bg-white/80 backdrop-blur px-3 py-2 hover:bg-white"
                 aria-label={lang === 'de' ? 'Im App Store öffnen' : 'Open in App Store'}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" className="opacity-80 group-hover:opacity-100" aria-hidden="true">
-                  <path fill="currentColor" d="M16.365 1.43c.02 1.18-.43 2.16-1.12 2.96-.74.84-1.94 1.48-3.12 1.4-.14-1.14.47-2.34 1.17-3.06.77-.8 2.05-1.39 3.07-1.3zM21 17.38c-.4.94-.88 1.77-1.43 2.49-.74.98-1.36 1.66-2.05 2.12-.79.49-1.64.74-2.55.75-.98.01-1.62-.23-2.23-.47-.53-.21-1.03-.41-1.58-.41-.58 0-1.1.2-1.65.41-.6.24-1.24.49-2.15.47-.92-.02-1.79-.32-2.6-.83-.74-.47-1.42-1.14-2.04-2.02C1.78 18.5.98 16.4 1 14.42c.01-1.26.29-2.49.83-3.58.53-1.07 1.27-1.94 2.22-2.6.83-.57 1.73-.88 2.68-.9.88-.02 1.62.25 2.2.5.51.21.96.39 1.34.39.35 0 .79-.17 1.31-.38.7-.28 1.5-.6 2.53-.53.93.04 1.78.34 2.55.9-.95.57-1.67 1.35-2.17 2.32-.53 1.02-.79 2.1-.8 3.23.01 1.27.35 2.32.92 3.17.56.84 1.31 1.43 2.23 1.75.22.08.46.14.7.2z"/>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  className="opacity-80 group-hover:opacity-100"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M16.365 1.43c.02 1.18-.43 2.16-1.12 2.96-.74.84-1.94 1.48-3.12 1.4-.14-1.14.47-2.34 1.17-3.06.77-.8 2.05-1.39 3.07-1.3zM21 17.38c-.4.94-.88 1.77-1.43 2.49-.74.98-1.36 1.66-2.05 2.12-.79.49-1.64.74-2.55.75-.98.01-1.62-.23-2.23-.47-.53-.21-1.03-.41-1.58-.41-.58 0-1.1.2-1.65.41-.6.24-1.24.49-2.15.47-.92-.02-1.79-.32-2.6-.83-.74-.47-1.42-1.14-2.04-2.02C1.78 18.5.98 16.4 1 14.42c.01-1.26.29-2.49.83-3.58.53-1.07 1.27-1.94 2.22-2.6.83-.57 1.73-.88 2.68-.9.88-.02 1.62.25 2.2.5.51.21.96.39 1.34.39.35 0 .79-.17 1.31-.38.7-.28 1.5-.6 2.53-.53.93.04 1.78.34 2.55.9-.95.57-1.67 1.35-2.17 2.32-.53 1.02-.79 2.1-.8 3.23.01 1.27.35 2.32.92 3.17.56.84 1.31 1.43 2.23 1.75.22.08.46.14.7.2z"
+                  />
                 </svg>
                 <span className="text-sm font-medium">App Store</span>
               </a>
@@ -276,8 +294,17 @@ export default function Home() {
                 className="group inline-flex items-center gap-2 rounded-xl border bg-white/80 backdrop-blur px-3 py-2 hover:bg-white"
                 aria-label={lang === 'de' ? 'In Google Play öffnen' : 'Open in Google Play'}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" className="opacity-80 group-hover:opacity-100" aria-hidden="true">
-                  <path fill="currentColor" d="M3.6 2.2l11.7 9.05c.3.23.3.68 0 .91L3.6 21.2c-.43.33-1.05.02-1.05-.46V2.66c0-.48.62-.79 1.05-.46zm13.5 6.1l3.38-2.63c.34-.26.82-.02.82.4v11.86c0 .42-.48.67-.82.4l-3.38-2.63-3.1-2.4a.6.6 0 010-.96l3.1-2.08z"/>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  className="opacity-80 group-hover:opacity-100"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M3.6 2.2l11.7 9.05c.3.23.3.68 0 .91L3.6 21.2c-.43.33-1.05.02-1.05-.46V2.66c0-.48.62-.79 1.05-.46zm13.5 6.1l3.38-2.63c.34-.26.82-.02.82.4v11.86c0 .42-.48.67-.82.4l-3.38-2.63-3.1-2.4a.6.6 0 010-.96l3.1-2.08z"
+                  />
                 </svg>
                 <span className="text-sm font-medium">Google Play</span>
               </a>
@@ -303,7 +330,7 @@ export default function Home() {
       <section id="features" className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="text-3xl font-bold mb-6">{tr.why_title}</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tr.why.map(([title, desc]: string[], i: number) => (
+          {tr.why.map(([title, desc]: [string, string], i: number) => (
             <div key={title} className="flex gap-4 items-start rounded-2xl border bg-white p-5 shadow-sm">
               <div className="shrink-0 grid place-items-center size-10 rounded-xl bg-gradient-to-br from-indigo-500 to-sky-400 text-white text-lg">
                 <span aria-hidden>{featureIcons[i % featureIcons.length]}</span>
@@ -330,18 +357,23 @@ export default function Home() {
       <section id="pricing" className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="text-3xl font-bold mb-6">{tr.pricing_title}</h2>
         <div className="grid md:grid-cols-3 gap-6">
-          {tr.plans.map(([name, price, period, list]: any[], i: number) => (
-            <div key={name as string} className={`rounded-2xl border bg-white shadow-sm h-full p-6 ${i === 1 ? 'ring-2 ring-indigo-600' : ''}`}>
+          {tr.plans.map(([name, price, period, list]: [string, string, string, string[]], i: number) => (
+            <div
+              key={name}
+              className={`rounded-2xl border bg-white shadow-sm h-full p-6 ${
+                i === 1 ? 'ring-2 ring-indigo-600' : ''
+              }`}
+            >
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold">{name as string}</h3>
+                <h3 className="font-semibold">{name}</h3>
                 {i === 1 && <span className="rounded-full border px-2 py-0.5 text-xs">Beliebt</span>}
               </div>
               <div className="mt-2">
-                <span className="text-3xl font-bold">{price as string}</span>
-                <span className="text-slate-500">/{period as string}</span>
+                <span className="text-3xl font-bold">{price}</span>
+                <span className="text-slate-500">/{period}</span>
               </div>
               <ul className="mt-4 space-y-2 text-sm">
-                {(list as string[]).map((h) => (
+                {list.map((h) => (
                   <li key={h} className="flex gap-2 items-start">
                     <span className="mt-1 size-3 rounded-full bg-indigo-600 inline-block" />
                     <span>{h}</span>
@@ -358,7 +390,7 @@ export default function Home() {
       <section id="faq" className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="text-3xl font-bold mb-6">{tr.faq_title}</h2>
         <div className="grid md:grid-cols-3 gap-6">
-          {tr.faqs.map(([q, a]: string[]) => (
+          {tr.faqs.map(([q, a]: [string, string]) => (
             <div key={q} className="rounded-2xl border bg-white p-6 shadow-sm">
               <h3 className="font-semibold">{q}</h3>
               <p className="text-sm text-slate-600 mt-1">{a}</p>
@@ -372,17 +404,15 @@ export default function Home() {
         <h2 className="text-3xl font-bold mb-3">{tr.join_title}</h2>
         <p className="text-slate-600 max-w-prose">{tr.join_body}</p>
 
-        <form
-          action="https://formspree.io/f/xanporqg"
-          method="POST"
-          className="mt-4 flex flex-col gap-3 max-w-xl"
-        >
+        <form action="https://formspree.io/f/xanporqg" method="POST" className="mt-4 flex flex-col gap-3 max-w-xl">
           <input type="hidden" name="role" value={role ?? 'pro'} />
           <input type="hidden" name="lang" value={lang} />
           <input type="hidden" name="_subject" value="AtYourService Warteliste" />
           <input type="text" name="_gotcha" className="hidden" tabIndex={-1} autoComplete="off" />
 
-          <label className="sr-only" htmlFor="email">Email</label>
+          <label className="sr-only" htmlFor="email">
+            Email
+          </label>
           <input
             id="email"
             name="email"
@@ -400,9 +430,7 @@ export default function Home() {
           </button>
         </form>
 
-        <p className="text-xs text-slate-500 mt-2">
-          {lang === 'de' ? t.de.note_sub : t.nl.note_sub}
-        </p>
+        <p className="text-xs text-slate-500 mt-2">{lang === 'de' ? t.de.note_sub : t.nl.note_sub}</p>
       </section>
 
       {/* FOOTER */}
@@ -410,9 +438,15 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-slate-500 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>© {new Date().getFullYear()} AtYourService • {tr.footer_rights}</div>
           <div className="flex gap-4">
-            <a className="hover:underline" href="#">{tr.footer_imprint}</a>
-            <a className="hover:underline" href="#">{tr.footer_privacy}</a>
-            <a className="hover:underline" href="#">{tr.footer_terms}</a>
+            <a className="hover:underline" href="#">
+              {tr.footer_imprint}
+            </a>
+            <a className="hover:underline" href="#">
+              {tr.footer_privacy}
+            </a>
+            <a className="hover:underline" href="#">
+              {tr.footer_terms}
+            </a>
           </div>
         </div>
       </footer>
