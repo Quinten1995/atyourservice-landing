@@ -24,3 +24,45 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* === Animated gradient + blobs (dezent) === */
+@keyframes gradientShift {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 0%; }
+}
+
+.animated-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    radial-gradient(60% 60% at 0% 0%, rgba(59,130,246,0.30) 0%, transparent 60%),
+    radial-gradient(55% 55% at 100% 0%, rgba(139,92,246,0.28) 0%, transparent 60%),
+    radial-gradient(60% 60% at 50% 100%, rgba(16,185,129,0.22) 0%, transparent 60%),
+    linear-gradient(120deg, #f5f7ff, #f6fbff, #f4fffd);
+  background-size: 120% 120%, 120% 120%, 120% 120%, 400% 400%;
+  animation: gradientShift 18s ease-in-out infinite;
+  filter: saturate(1.05);
+}
+
+/* sanfte, schwebende Farbflecken */
+@keyframes blob {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(24px, -28px) scale(1.05); }
+  66%  { transform: translate(-18px, 22px) scale(0.98); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(32px);
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  animation: blob 22s ease-in-out infinite;
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animated-gradient, .blob { animation: none !important; }
+}
