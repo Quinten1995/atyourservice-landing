@@ -184,6 +184,7 @@ export default function Home() {
   } as const;
 
   const [role, setRole] = useState<'customer' | 'pro' | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const shots = [
     { src: '/screens/01.png', alt: 'App: Jobliste' },
@@ -191,6 +192,50 @@ export default function Home() {
     { src: '/screens/03.png', alt: 'App: Onboarding' },
     { src: '/screens/04.png', alt: 'App: Jobkarte' },
   ];
+
+  /** Clientseitiger Submit:
+   *  - sendet an Formspree
+   *  - redirectet danach auf /thanks?email=...&role=...&lang=... (+UTM)
+   */
+  const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    setSubmitting(true);
+
+    try {
+      // 1) an Formspree senden
+      await fetch(form.action, {
+        method: 'POST',
+        body: fd,
+        headers: { Accept: 'application/json' },
+      }).catch(() => { /* Netzwerkfehler ignorieren, wir redirecten trotzdem */ });
+
+      // 2) Ziel-URL zusammenbauen
+      const params = new URLSearchParams();
+
+      const email = String(fd.get('email') ?? '');
+      const roleVal = String(fd.get('role') ?? '');
+      const langVal = String(fd.get('lang') ?? '');
+
+      if (email) params.set('email', email);
+      if (roleVal) params.set('role', roleVal);
+      if (langVal) params.set('lang', langVal);
+
+      // UTM-Parameter übernehmen
+      const current = new URLSearchParams(window.location.search);
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach((k) => {
+        const v = current.get(k);
+        if (v) params.set(k, v);
+      });
+
+      const base = process.env.NEXT_PUBLIC_SITE_URL ?? '';
+      const dest = `${base || ''}/thanks?${params.toString()}`;
+      window.location.assign(dest);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
@@ -203,15 +248,9 @@ export default function Home() {
             <span className="ml-2 rounded-full border px-2 py-0.5 text-xs">Beta</span>
           </div>
           <nav className="hidden sm:flex items-center gap-4 text-sm">
-            <a href="#features" className="hover:underline">
-              {tr.nav_features}
-            </a>
-            <a href="#pricing" className="hover:underline">
-              {tr.nav_pricing}
-            </a>
-            <a href="#faq" className="hover:underline">
-              {tr.nav_faq}
-            </a>
+            <a href="#features" className="hover:underline">{tr.nav_features}</a>
+            <a href="#pricing" className="hover:underline">{tr.nav_pricing}</a>
+            <a href="#faq" className="hover:underline">{tr.nav_faq}</a>
             <a href="#join" className="ml-2 rounded-lg border px-3 py-1.5 hover:bg-slate-50">
               {tr.nav_join}
             </a>
@@ -273,17 +312,8 @@ export default function Home() {
                 className="group inline-flex items-center gap-2 rounded-xl border bg-white/80 backdrop-blur px-3 py-2 hover:bg-white"
                 aria-label={lang === 'de' ? 'Im App Store öffnen' : 'Open in App Store'}
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  className="opacity-80 group-hover:opacity-100"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M16.365 1.43c.02 1.18-.43 2.16-1.12 2.96-.74.84-1.94 1.48-3.12 1.4-.14-1.14.47-2.34 1.17-3.06.77-.8 2.05-1.39 3.07-1.3zM21 17.38c-.4.94-.88 1.77-1.43 2.49-.74.98-1.36 1.66-2.05 2.12-.79.49-1.64.74-2.55.75-.98.01-1.62-.23-2.23-.47-.53-.21-1.03-.41-1.58-.41-.58 0-1.1.2-1.65.41-.6.24-1.24.49-2.15.47-.92-.02-1.79-.32-2.6-.83-.74-.47-1.42-1.14-2.04-2.02C1.78 18.5.98 16.4 1 14.42c.01-1.26.29-2.49.83-3.58.53-1.07 1.27-1.94 2.22-2.6.83-.57 1.73-.88 2.68-.9.88-.02 1.62.25 2.2.5.51.21.96.39 1.34.39.35 0 .79-.17 1.31-.38.7-.28 1.5-.6 2.53-.53.93.04 1.78.34 2.55.9-.95.57-1.67 1.35-2.17 2.32-.53 1.02-.79 2.1-.8 3.23.01 1.27.35 2.32.92 3.17.56.84 1.31 1.43 2.23 1.75.22.08.46.14.7.2z"
-                  />
+                <svg width="18" height="18" viewBox="0 0 24 24" className="opacity-80 group-hover:opacity-100" aria-hidden="true">
+                  <path fill="currentColor" d="M16.365 1.43c.02 1.18-.43 2.16-1.12 2.96-.74.84-1.94 1.48-3.12 1.4-.14-1.14.47-2.34 1.17-3.06.77-.8 2.05-1.39 3.07-1.3zM21 17.38c-.4.94-.88 1.77-1.43 2.49-.74.98-1.36 1.66-2.05 2.12-.79.49-1.64.74-2.55.75-.98.01-1.62-.23-2.23-.47-.53-.21-1.03-.41-1.58-.41-.58 0-1.1.2-1.65.41-.6.24-1.24.49-2.15.47-.92-.02-1.79-.32-2.6-.83-.74-.47-1.42-1.14-2.04-2.02C1.78 18.5.98 16.4 1 14.42c.01-1.26.29-2.49.83-3.58.53-1.07 1.27-1.94 2.22-2.6.83-.57 1.73-.88 2.68-.9.88-.02 1.62.25 2.2.5.51.21.96.39 1.34.39.35 0 .79-.17 1.31-.38.7-.28 1.5-.6 2.53-.53.93.04 1.78.34 2.55.9-.95.57-1.67 1.35-2.17 2.32-.53 1.02-.79 2.1-.8 3.23.01 1.27.35 2.32.92 3.17.56.84 1.31 1.43 2.23 1.75.22.08.46.14.7.2z"/>
                 </svg>
                 <span className="text-sm font-medium">App Store</span>
               </a>
@@ -294,17 +324,8 @@ export default function Home() {
                 className="group inline-flex items-center gap-2 rounded-xl border bg-white/80 backdrop-blur px-3 py-2 hover:bg-white"
                 aria-label={lang === 'de' ? 'In Google Play öffnen' : 'Open in Google Play'}
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  className="opacity-80 group-hover:opacity-100"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M3.6 2.2l11.7 9.05c.3.23.3.68 0 .91L3.6 21.2c-.43.33-1.05.02-1.05-.46V2.66c0-.48.62-.79 1.05-.46zm13.5 6.1l3.38-2.63c.34-.26.82-.02.82.4v11.86c0 .42-.48.67-.82.4l-3.38-2.63-3.1-2.4a.6.6 0 010-.96l3.1-2.08z"
-                  />
+                <svg width="18" height="18" viewBox="0 0 24 24" className="opacity-80 group-hover:opacity-100" aria-hidden="true">
+                  <path fill="currentColor" d="M3.6 2.2l11.7 9.05c.3.23.3.68 0 .91L3.6 21.2c-.43.33-1.05.02-1.05-.46V2.66c0-.48.62-.79 1.05-.46zm13.5 6.1l3.38-2.63c.34-.26.82-.02.82.4v11.86c0 .42-.48.67-.82.4l-3.38-2.63-3.1-2.4a.6.6 0 010-.96l3.1-2.08z"/>
                 </svg>
                 <span className="text-sm font-medium">Google Play</span>
               </a>
@@ -360,9 +381,7 @@ export default function Home() {
           {tr.plans.map(([name, price, period, list]: [string, string, string, string[]], i: number) => (
             <div
               key={name}
-              className={`rounded-2xl border bg-white shadow-sm h-full p-6 ${
-                i === 1 ? 'ring-2 ring-indigo-600' : ''
-              }`}
+              className={`rounded-2xl border bg-white shadow-sm h-full p-6 ${i === 1 ? 'ring-2 ring-indigo-600' : ''}`}
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{name}</h3>
@@ -404,15 +423,18 @@ export default function Home() {
         <h2 className="text-3xl font-bold mb-3">{tr.join_title}</h2>
         <p className="text-slate-600 max-w-prose">{tr.join_body}</p>
 
-        <form action="https://formspree.io/f/xanporqg" method="POST" className="mt-4 flex flex-col gap-3 max-w-xl">
+        <form
+          action="https://formspree.io/f/xanporqg"
+          method="POST"
+          onSubmit={onSubmit}
+          className="mt-4 flex flex-col gap-3 max-w-xl"
+        >
           <input type="hidden" name="role" value={role ?? 'pro'} />
           <input type="hidden" name="lang" value={lang} />
           <input type="hidden" name="_subject" value="AtYourService Warteliste" />
           <input type="text" name="_gotcha" className="hidden" tabIndex={-1} autoComplete="off" />
 
-          <label className="sr-only" htmlFor="email">
-            Email
-          </label>
+          <label className="sr-only" htmlFor="email">Email</label>
           <input
             id="email"
             name="email"
@@ -421,16 +443,24 @@ export default function Home() {
             className="h-11 rounded-xl border px-3"
             required
           />
-          <button className="h-11 rounded-xl bg-indigo-600 text-white px-5">
-            {role === 'pro'
-              ? (lang === 'de' ? t.de.btn_join_as_pro : t.nl.btn_join_as_pro)
-              : role === 'customer'
-              ? (lang === 'de' ? t.de.btn_join_as_customer : t.nl.btn_join_as_customer)
-              : (lang === 'de' ? t.de.join_cta : t.nl.join_cta)}
+
+          <button
+            className="h-11 rounded-xl bg-indigo-600 text-white px-5 disabled:opacity-50"
+            disabled={submitting}
+          >
+            {submitting
+              ? 'Wird gesendet…'
+              : role === 'pro'
+                ? (lang === 'de' ? t.de.btn_join_as_pro : t.nl.btn_join_as_pro)
+                : role === 'customer'
+                  ? (lang === 'de' ? t.de.btn_join_as_customer : t.nl.btn_join_as_customer)
+                  : (lang === 'de' ? t.de.join_cta : t.nl.join_cta)}
           </button>
         </form>
 
-        <p className="text-xs text-slate-500 mt-2">{lang === 'de' ? t.de.note_sub : t.nl.note_sub}</p>
+        <p className="text-xs text-slate-500 mt-2">
+          {lang === 'de' ? t.de.note_sub : t.nl.note_sub}
+        </p>
       </section>
 
       {/* FOOTER */}
@@ -438,15 +468,9 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-slate-500 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>© {new Date().getFullYear()} AtYourService • {tr.footer_rights}</div>
           <div className="flex gap-4">
-            <a className="hover:underline" href="#">
-              {tr.footer_imprint}
-            </a>
-            <a className="hover:underline" href="#">
-              {tr.footer_privacy}
-            </a>
-            <a className="hover:underline" href="#">
-              {tr.footer_terms}
-            </a>
+            <a className="hover:underline" href="#">{tr.footer_imprint}</a>
+            <a className="hover:underline" href="#">{tr.footer_privacy}</a>
+            <a className="hover:underline" href="#">{tr.footer_terms}</a>
           </div>
         </div>
       </footer>
