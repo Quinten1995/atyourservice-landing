@@ -2,7 +2,44 @@
 
 import { useState, useEffect } from 'react';
 
-/** Übersetzungen als konstantes Objekt (keine anys) */
+/** Übersetzungen strikt typisiert (keine anys) */
+type WhyItem = [title: string, desc: string];
+type PlanItem = [name: string, price: string, period: string, features: string[]];
+type FaqItem = [q: string, a: string];
+
+type Dict = {
+  nav_features: string;
+  nav_pricing: string;
+  nav_faq: string;
+  nav_join: string;
+  badge: string;
+  hero_title: string;
+  hero_sub: string;
+  cta_customer: string;
+  cta_pro: string;
+  store_badge: string;
+  why_title: string;
+  why: WhyItem[];
+  note_title: string;
+  note_body: string;
+  pricing_title: string;
+  plans: PlanItem[];
+  faq_title: string;
+  faqs: FaqItem[];
+  join_title: string;
+  join_body: string;
+  join_cta: string;
+  footer_rights: string;
+  footer_imprint: string;
+  footer_privacy: string;
+  footer_terms: string;
+  note_sub: string;
+  role_customer: string;
+  role_pro: string;
+  btn_join_as_pro: string;
+  btn_join_as_customer: string;
+};
+
 const t = {
   de: {
     nav_features: 'Features',
@@ -24,7 +61,7 @@ const t = {
       ['Keine Provisionen', '0% Gebühren. Keine versteckten Kosten – fair und transparent.'],
       ['7 Sprachen', 'Die App passt sich automatisch an deine Gerätesprache an.'],
       ['First come, first served', 'Wer zuerst reagiert, hat die besten Chancen – nachvollziehbar.'],
-    ] as [string, string][],
+    ] as WhyItem[],
     note_title: 'Hinweis zum Start',
     note_body:
       'Wir rollen Städte schrittweise aus. Anfangs siehst du ggf. wenige oder keine Jobs – das ändert sich schnell.',
@@ -33,13 +70,13 @@ const t = {
       ['Free', '0€', 'immer', ['Jobs im Umkreis sehen', 'Push bei neuen Aufträgen', 'Basis-Profil']],
       ['Silber', '9,99€', 'Monat', ['Erweiterter Radius', 'Höhere Sichtbarkeit', 'Schnellere Benachrichtigungen']],
       ['Gold', '19,99€', 'Monat', ['Max. Radius & Priorität', 'Top-Platzierungen', 'Premium-Support']],
-    ] as [string, string, string, string[]][],
+    ] as PlanItem[],
     faq_title: 'FAQ',
     faqs: [
       ['Gibt es Provisionen?', 'Nein. Wir nehmen 0% – Preis & Zahlung klärt ihr direkt miteinander.'],
       ['Wie bekomme ich Jobs?', 'Push-Meldungen für neue Aufträge in deinem Radius. Wer zuerst reagiert, hat die besten Chancen.'],
       ['Wann startet meine Stadt?', 'Phasenweise Rollout. Trag dich ein – wir informieren dich, sobald deine Stadt live ist.'],
-    ] as [string, string][],
+    ] as FaqItem[],
     join_title: 'Früh dabei sein?',
     join_body:
       'Trag dich ein, wenn du Dienstleister bist – das Abo gilt nur für Dienstleister (Kunden brauchen kein Abo und nutzen die App kostenlos).',
@@ -74,7 +111,7 @@ const t = {
       ['Geen commissies', '0% kosten. Geen verborgen kosten – eerlijk en transparant.'],
       ['7 talen', 'De app past zich automatisch aan je toesteltaal aan.'],
       ['First come, first served', 'Wie eerst reageert, maakt de meeste kans – eenvoudig & eerlijk.'],
-    ] as [string, string][],
+    ] as WhyItem[],
     note_title: 'Opstartnotitie',
     note_body:
       'We rollen steden gefaseerd uit. In het begin zie je mogelijk weinig jobs – dat verandert snel.',
@@ -83,13 +120,13 @@ const t = {
       ['Free', '€0', 'altijd', ['Jobs in jouw straal', 'Push bij nieuwe opdrachten', 'Basisprofiel']],
       ['Zilver', '€9,99', 'maand', ['Grotere straal', 'Meer zichtbaarheid', 'Snellere meldingen']],
       ['Goud', '€19,99', 'maand', ['Max. straal & prioriteit', 'Top-posities', 'Premium support']],
-    ] as [string, string, string, string[]][],
+    ] as PlanItem[],
     faq_title: 'Veelgestelde vragen',
     faqs: [
       ['Zijn er commissies?', 'Nee. Wij nemen 0% – prijs & betaling regel je rechtstreeks met de klant.'],
       ['Hoe krijg ik jobs?', 'Pushmeldingen voor nieuwe opdrachten binnen jouw straal. Eerst reageren = meeste kans.'],
       ['Wanneer start mijn stad?', 'Gefaseerde uitrol. Schrijf je in – we laten het weten zodra jouw stad live is.'],
-    ] as [string, string][],
+    ] as FaqItem[],
     join_title: 'Als eerste erbij?',
     join_body:
       'Schrijf je in als je vakman bent – het abonnement is alleen voor vakmensen (klanten hebben geen abonnement en gebruiken de app gratis).',
@@ -106,10 +143,9 @@ const t = {
   },
 } as const;
 
-/** Sprachtyp direkt aus den Keys abgeleitet */
 type Lang = keyof typeof t;
 
-/* ---------- Stabiler Crossfade-Slider für Hochformat-Screens ---------- */
+/* ---------- Slider (Crossfade) ---------- */
 function ScreenshotSlider({ shots }: { shots: { src: string; alt: string }[] }) {
   const [i, setI] = useState(0);
 
@@ -125,6 +161,7 @@ function ScreenshotSlider({ shots }: { shots: { src: string; alt: string }[] }) 
       <div className="rounded-3xl border border-slate-200 bg-white/80 backdrop-blur shadow-xl overflow-hidden p-4">
         <div className="relative rounded-2xl overflow-hidden bg-slate-50 aspect-[9/19]">
           {shots.map((s, idx) => (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               key={s.src}
               src={s.src}
@@ -138,7 +175,6 @@ function ScreenshotSlider({ shots }: { shots: { src: string; alt: string }[] }) 
         </div>
       </div>
 
-      {/* Prev / Next */}
       <button
         onClick={() => go(-1)}
         className="absolute -left-2 top-1/2 -translate-y-1/2 rounded-full border bg-white/90 px-2 py-1 text-sm opacity-0 group-hover:opacity-100 transition"
@@ -154,7 +190,6 @@ function ScreenshotSlider({ shots }: { shots: { src: string; alt: string }[] }) 
         ›
       </button>
 
-      {/* Dots */}
       <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
         {shots.map((_, idx) => (
           <button
@@ -171,48 +206,9 @@ function ScreenshotSlider({ shots }: { shots: { src: string; alt: string }[] }) 
   );
 }
 
-/* ---------- Deep-Linking: App öffnen (Premium) oder Store-Fallback ---------- */
-type PlanKey = 'free' | 'silver' | 'gold';
-
-const APP_SCHEME = 'atyourservice://premium';
-const ANDROID_PKG = 'com.quinten.atyourservice';
-
-function openPlanDeepLink(plan: PlanKey, storeLinks: { ios: string; android: string }) {
-  const qs = new URLSearchParams({ plan, source: 'landing' }).toString();
-  const schemeUrl = `${APP_SCHEME}?${qs}`;
-  const androidIntent = `intent://premium?${qs}#Intent;scheme=atyourservice;package=${ANDROID_PKG};S.browser_fallback_url=${encodeURIComponent(
-    storeLinks.android
-  )};end`;
-
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  let didHide = false;
-  const hiddenProp = 'hidden' in document ? 'hidden' : ('webkitHidden' in document ? 'webkitHidden' : '') as keyof Document;
-  const visibilityEvent = hiddenProp === 'hidden' ? 'visibilitychange' : hiddenProp ? 'webkitvisibilitychange' : '';
-
-  const onHidden = () => { didHide = true; };
-  if (visibilityEvent) document.addEventListener(visibilityEvent, onHidden as any, { once: true });
-
-  const start = Date.now();
-  const go = (url: string) => { window.location.href = url; };
-
-  if (isAndroid) {
-    go(androidIntent);
-  } else if (isIOS) {
-    go(schemeUrl);
-    setTimeout(() => {
-      if (!didHide && Date.now() - start < 1800) window.location.href = storeLinks.ios;
-    }, 1200);
-  } else {
-    // Desktop: direkt zum Store (optional)
-    window.location.href = storeLinks.ios;
-  }
-}
-
 export default function Home() {
   const [lang, setLang] = useState<Lang>('de');
-  const tr = t[lang];
+  const tr: Dict = t[lang];
 
   const featureIcons = ['📍', '🔔', '🤝', '🛡️', '🌐', '⚡️'] as const;
 
@@ -232,7 +228,6 @@ export default function Home() {
     { src: '/screens/04.png', alt: 'App: Jobkarte' },
   ];
 
-  /** Clientseitiger Submit → Formspree + Redirect auf /thanks (mit UTM-Übernahme) */
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -365,7 +360,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Slider rechts – fixierte Breite, kein Überlaufen */}
+          {/* Slider rechts */}
           <div className="relative flex justify-center md:justify-end">
             <div className="w-[min(100%,360px)] md:w-[420px]">
               <ScreenshotSlider shots={shots} />
@@ -383,7 +378,7 @@ export default function Home() {
       <section id="features" className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="text-3xl font-bold mb-6">{tr.why_title}</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tr.why.map(([title, desc]: [string, string], i: number) => (
+          {tr.why.map(([title, desc]: WhyItem, i: number) => (
             <div key={title} className="flex gap-4 items-start rounded-2xl border bg-white p-5 shadow-sm">
               <div className="shrink-0 grid place-items-center size-10 rounded-xl bg-gradient-to-br from-indigo-500 to-sky-400 text-white text-lg">
                 <span aria-hidden>{featureIcons[i % featureIcons.length]}</span>
@@ -410,42 +405,30 @@ export default function Home() {
       <section id="pricing" className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="text-3xl font-bold mb-6">{tr.pricing_title}</h2>
         <div className="grid md:grid-cols-3 gap-6">
-          {tr.plans.map(([name, price, period, list]: [string, string, string, string[]], i: number) => {
-            const planKey: PlanKey =
-              name.toLowerCase() === 'free' ? 'free' :
-              name.toLowerCase().startsWith('sil') ? 'silver' : 'gold';
-
-            return (
-              <div
-                key={name}
-                className={`rounded-2xl border bg-white shadow-sm h-full p-6 ${i === 1 ? 'ring-2 ring-indigo-600' : ''}`}
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">{name}</h3>
-                  {i === 1 && <span className="rounded-full border px-2 py-0.5 text-xs">Beliebt</span>}
-                </div>
-                <div className="mt-2">
-                  <span className="text-3xl font-bold">{price}</span>
-                  <span className="text-slate-500">/{period}</span>
-                </div>
-                <ul className="mt-4 space-y-2 text-sm">
-                  {list.map((h) => (
-                    <li key={h} className="flex gap-2 items-start">
-                      <span className="mt-1 size-3 rounded-full bg-indigo-600 inline-block" />
-                      <span>{h}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  type="button"
-                  onClick={() => openPlanDeepLink(planKey, { ios: store.ios, android: store.android })}
-                  className="mt-5 w-full rounded-lg border px-4 py-2 hover:bg-slate-50"
-                >
-                  Jetzt wählen
-                </button>
+          {tr.plans.map(([name, price, period, list]: PlanItem, i: number) => (
+            <div
+              key={name}
+              className={`rounded-2xl border bg-white shadow-sm h-full p-6 ${i === 1 ? 'ring-2 ring-indigo-600' : ''}`}
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">{name}</h3>
+                {i === 1 && <span className="rounded-full border px-2 py-0.5 text-xs">Beliebt</span>}
               </div>
-            );
-          })}
+              <div className="mt-2">
+                <span className="text-3xl font-bold">{price}</span>
+                <span className="text-slate-500">/{period}</span>
+              </div>
+              <ul className="mt-4 space-y-2 text-sm">
+                {list.map((h: string) => (
+                  <li key={h} className="flex gap-2 items-start">
+                    <span className="mt-1 size-3 rounded-full bg-indigo-600 inline-block" />
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+              <button className="mt-5 w-full rounded-lg border px-4 py-2 hover:bg-slate-50">Jetzt wählen</button>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -453,7 +436,7 @@ export default function Home() {
       <section id="faq" className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="text-3xl font-bold mb-6">{tr.faq_title}</h2>
         <div className="grid md:grid-cols-3 gap-6">
-          {tr.faqs.map(([q, a]: [string, string]) => (
+          {tr.faqs.map(([q, a]: FaqItem) => (
             <div key={q} className="rounded-2xl border bg-white p-6 shadow-sm">
               <h3 className="font-semibold">{q}</h3>
               <p className="text-sm text-slate-600 mt-1">{a}</p>
@@ -495,16 +478,14 @@ export default function Home() {
             {submitting
               ? 'Wird gesendet…'
               : role === 'pro'
-                ? (lang === 'de' ? t.de.btn_join_as_pro : t.nl.btn_join_as_pro)
+                ? t.de.btn_join_as_pro // Button-Text nur als Beispiel DE/NL – kannst du bei Bedarf lokalisieren
                 : role === 'customer'
-                  ? (lang === 'de' ? t.de.btn_join_as_customer : t.nl.btn_join_as_customer)
-                  : (lang === 'de' ? t.de.join_cta : t.nl.join_cta)}
+                  ? t.de.btn_join_as_customer
+                  : tr.join_cta}
           </button>
         </form>
 
-        <p className="text-xs text-slate-500 mt-2">
-          {lang === 'de' ? t.de.note_sub : t.nl.note_sub}
-        </p>
+        <p className="text-xs text-slate-500 mt-2">{tr.note_sub}</p>
       </section>
 
       {/* FOOTER */}
