@@ -228,6 +228,24 @@ export default function Home() {
     { src: '/screens/04.png', alt: 'App: Jobkarte' },
   ];
 
+  /** App öffnen per Custom-Scheme mit Store-Fallback */
+  const openApp = (plan: 'free' | 'silber' | 'gold') => {
+    const schemeUrl = `atyourservice://subscribe?plan=${encodeURIComponent(plan)}`;
+    const isIOS = /iPad|iPhone|iPod/i.test(navigator.userAgent);
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const storeUrl = isIOS ? store.ios : store.android;
+
+    const started = Date.now();
+    window.location.href = schemeUrl;
+
+    setTimeout(() => {
+      if (Date.now() - started < 1500) {
+        window.location.href = storeUrl;
+      }
+    }, 1200);
+  };
+
+  /** Form Submit -> Formspree senden -> /thanks inkl. UTM-Params */
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -426,7 +444,27 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <button className="mt-5 w-full rounded-lg border px-4 py-2 hover:bg-slate-50">Jetzt wählen</button>
+
+              {/* Deep-Link Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  const planKey =
+                    name.toLowerCase().includes('silber') || name.toLowerCase().includes('zilver') ? 'silber' :
+                    name.toLowerCase().includes('gold')   || name.toLowerCase().includes('goud')   ? 'gold'   :
+                    'free';
+
+                  if (planKey === 'free') {
+                    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                    return;
+                  }
+                  openApp(planKey as 'silber' | 'gold' | 'free');
+                }}
+                className="mt-5 w-full rounded-lg border px-4 py-2 hover:bg-slate-50"
+                aria-label={`Abo ${name} in der App öffnen`}
+              >
+                Jetzt wählen
+              </button>
             </div>
           ))}
         </div>
@@ -478,9 +516,9 @@ export default function Home() {
             {submitting
               ? 'Wird gesendet…'
               : role === 'pro'
-                ? t.de.btn_join_as_pro // Button-Text nur als Beispiel DE/NL – kannst du bei Bedarf lokalisieren
+                ? tr.btn_join_as_pro
                 : role === 'customer'
-                  ? t.de.btn_join_as_customer
+                  ? tr.btn_join_as_customer
                   : tr.join_cta}
           </button>
         </form>
