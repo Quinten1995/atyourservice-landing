@@ -1,44 +1,59 @@
 // app/thanks/page.tsx
-'use client';
+import Link from "next/link";
 
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+export const dynamic = "force-static"; // Seite darf statisch vorgerendert werden
 
-export default function Thanks() {
-  const q = useSearchParams();
-  const email = q.get('email') || q.get('e') || '';
-  const utmSource = q.get('utm_source') || '';
-  const utmMedium = q.get('utm_medium') || '';
-  const utmCampaign = q.get('utm_campaign') || '';
+type ThanksProps = {
+  searchParams?: {
+    name?: string | string[];
+    email?: string | string[];
+    role?: string | string[];
+  };
+};
+
+export default function Thanks({ searchParams }: ThanksProps) {
+  const name =
+    (Array.isArray(searchParams?.name) ? searchParams?.name[0] : searchParams?.name) ?? "";
+  const email =
+    (Array.isArray(searchParams?.email) ? searchParams?.email[0] : searchParams?.email) ?? "";
+  const role =
+    (Array.isArray(searchParams?.role) ? searchParams?.role[0] : searchParams?.role) ?? "";
 
   return (
-    <main className="min-h-screen grid place-items-center bg-gradient-to-b from-white to-slate-50">
-      <div className="max-w-lg w-full mx-4 rounded-2xl border bg-white shadow p-8 text-center">
-        <h1 className="text-2xl font-semibold">Danke fürs Eintragen! 🙌</h1>
-        <p className="text-slate-600 mt-2">
-          Wir melden uns, sobald deine Stadt live ist.
+    <main className="min-h-[70vh] grid place-items-center px-4">
+      <div className="max-w-xl w-full rounded-2xl border bg-white p-8 shadow-sm text-center">
+        <h1 className="text-3xl font-semibold">Danke fürs Eintragen! 🎉</h1>
+        <p className="mt-3 text-slate-600">
+          Wir haben {name ? <strong>{name}</strong> : "dich"} auf die Warteliste gesetzt
+          {role ? <> als <strong>{role}</strong></> : null}.
+          {email ? <> Eine Bestätigung geht an <strong>{email}</strong>.</> : null}
         </p>
 
-        {email ? (
-          <p className="text-sm text-slate-500 mt-4">
-            <span className="font-medium">E-Mail:</span> {email}
-          </p>
-        ) : null}
-
-        {(utmSource || utmMedium || utmCampaign) ? (
-          <p className="text-xs text-slate-400 mt-2">
-            Quelle: {utmSource || '–'} / {utmMedium || '–'} / {utmCampaign || '–'}
-          </p>
-        ) : null}
-
-        <div className="mt-6">
-          <Link
-            href="/"
-            className="inline-flex items-center rounded-lg border px-4 py-2 hover:bg-slate-50"
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <a
+            href="https://apps.apple.com/be/app/atyourservice24/id6748581941"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-xl border px-4 py-3 hover:bg-slate-50"
           >
-            Zurück zur Startseite
-          </Link>
+            App Store öffnen
+          </a>
+          <a
+            href="https://play.google.com/store/apps/details?id=com.quinten.atyourservice&pcampaignid=web_share"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-xl border px-4 py-3 hover:bg-slate-50"
+          >
+            Google Play öffnen
+          </a>
         </div>
+
+        <Link
+          href="/"
+          className="mt-6 inline-block rounded-xl bg-indigo-600 px-5 py-3 text-white hover:bg-indigo-700"
+        >
+          Zurück zur Startseite
+        </Link>
       </div>
     </main>
   );
