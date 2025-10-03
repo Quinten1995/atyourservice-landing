@@ -171,6 +171,45 @@ function ScreenshotSlider({ shots }: { shots: { src: string; alt: string }[] }) 
   );
 }
 
+/* ---------- Deep-Linking: App öffnen (Premium) oder Store-Fallback ---------- */
+type PlanKey = 'free' | 'silver' | 'gold';
+
+const APP_SCHEME = 'atyourservice://premium';
+const ANDROID_PKG = 'com.quinten.atyourservice';
+
+function openPlanDeepLink(plan: PlanKey, storeLinks: { ios: string; android: string }) {
+  const qs = new URLSearchParams({ plan, source: 'landing' }).toString();
+  const schemeUrl = `${APP_SCHEME}?${qs}`;
+  const androidIntent = `intent://premium?${qs}#Intent;scheme=atyourservice;package=${ANDROID_PKG};S.browser_fallback_url=${encodeURIComponent(
+    storeLinks.android
+  )};end`;
+
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  let didHide = false;
+  const hiddenProp = 'hidden' in document ? 'hidden' : ('webkitHidden' in document ? 'webkitHidden' : '') as keyof Document;
+  const visibilityEvent = hiddenProp === 'hidden' ? 'visibilitychange' : hiddenProp ? 'webkitvisibilitychange' : '';
+
+  const onHidden = () => { didHide = true; };
+  if (visibilityEvent) document.addEventListener(visibilityEvent, onHidden as any, { once: true });
+
+  const start = Date.now();
+  const go = (url: string) => { window.location.href = url; };
+
+  if (isAndroid) {
+    go(androidIntent);
+  } else if (isIOS) {
+    go(schemeUrl);
+    setTimeout(() => {
+      if (!didHide && Date.now() - start < 1800) window.location.href = storeLinks.ios;
+    }, 1200);
+  } else {
+    // Desktop: direkt zum Store (optional)
+    window.location.href = storeLinks.ios;
+  }
+}
+
 export default function Home() {
   const [lang, setLang] = useState<Lang>('de');
   const tr = t[lang];
@@ -193,10 +232,7 @@ export default function Home() {
     { src: '/screens/04.png', alt: 'App: Jobkarte' },
   ];
 
-  /** Clientseitiger Submit:
-   *  - sendet an Formspree
-   *  - redirectet danach auf /thanks?email=...&role=...&lang=... (+UTM)
-   */
+  /** Clientseitiger Submit → Formspree + Redirect auf /thanks (mit UTM-Übernahme) */
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -204,16 +240,13 @@ export default function Home() {
     setSubmitting(true);
 
     try {
-      // 1) an Formspree senden
       await fetch(form.action, {
         method: 'POST',
         body: fd,
         headers: { Accept: 'application/json' },
-      }).catch(() => { /* Netzwerkfehler ignorieren, wir redirecten trotzdem */ });
+      }).catch(() => {});
 
-      // 2) Ziel-URL zusammenbauen
       const params = new URLSearchParams();
-
       const email = String(fd.get('email') ?? '');
       const roleVal = String(fd.get('role') ?? '');
       const langVal = String(fd.get('lang') ?? '');
@@ -222,7 +255,6 @@ export default function Home() {
       if (roleVal) params.set('role', roleVal);
       if (langVal) params.set('lang', langVal);
 
-      // UTM-Parameter übernehmen
       const current = new URLSearchParams(window.location.search);
       ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach((k) => {
         const v = current.get(k);
@@ -378,30 +410,42 @@ export default function Home() {
       <section id="pricing" className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="text-3xl font-bold mb-6">{tr.pricing_title}</h2>
         <div className="grid md:grid-cols-3 gap-6">
-          {tr.plans.map(([name, price, period, list]: [string, string, string, string[]], i: number) => (
-            <div
-              key={name}
-              className={`rounded-2xl border bg-white shadow-sm h-full p-6 ${i === 1 ? 'ring-2 ring-indigo-600' : ''}`}
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold">{name}</h3>
-                {i === 1 && <span className="rounded-full border px-2 py-0.5 text-xs">Beliebt</span>}
+          {tr.plans.map(([name, price, period, list]: [string, string, string, string[]], i: number) => {
+            const planKey: PlanKey =
+              name.toLowerCase() === 'free' ? 'free' :
+              name.toLowerCase().startsWith('sil') ? 'silver' : 'gold';
+
+            return (
+              <div
+                key={name}
+                className={`rounded-2xl border bg-white shadow-sm h-full p-6 ${i === 1 ? 'ring-2 ring-indigo-600' : ''}`}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">{name}</h3>
+                  {i === 1 && <span className="rounded-full border px-2 py-0.5 text-xs">Beliebt</span>}
+                </div>
+                <div className="mt-2">
+                  <span className="text-3xl font-bold">{price}</span>
+                  <span className="text-slate-500">/{period}</span>
+                </div>
+                <ul className="mt-4 space-y-2 text-sm">
+                  {list.map((h) => (
+                    <li key={h} className="flex gap-2 items-start">
+                      <span className="mt-1 size-3 rounded-full bg-indigo-600 inline-block" />
+                      <span>{h}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  onClick={() => openPlanDeepLink(planKey, { ios: store.ios, android: store.android })}
+                  className="mt-5 w-full rounded-lg border px-4 py-2 hover:bg-slate-50"
+                >
+                  Jetzt wählen
+                </button>
               </div>
-              <div className="mt-2">
-                <span className="text-3xl font-bold">{price}</span>
-                <span className="text-slate-500">/{period}</span>
-              </div>
-              <ul className="mt-4 space-y-2 text-sm">
-                {list.map((h) => (
-                  <li key={h} className="flex gap-2 items-start">
-                    <span className="mt-1 size-3 rounded-full bg-indigo-600 inline-block" />
-                    <span>{h}</span>
-                  </li>
-                ))}
-              </ul>
-              <button className="mt-5 w-full rounded-lg border px-4 py-2 hover:bg-slate-50">Jetzt wählen</button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
