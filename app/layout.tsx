@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/react"; // 👈 hinzugefügt
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -9,7 +10,8 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://atyourservice24.eu";
 const store = {
-  android: "https://play.google.com/store/apps/details?id=com.quinten.atyourservice&pcampaignid=web_share",
+  android:
+    "https://play.google.com/store/apps/details?id=com.quinten.atyourservice&pcampaignid=web_share",
   ios: "https://apps.apple.com/be/app/atyourservice24/id6748581941",
 };
 
@@ -107,6 +109,9 @@ export default function RootLayout({
         <Script id="ld-app" type="application/ld+json" strategy="afterInteractive">
           {JSON.stringify(appLd)}
         </Script>
+
+        {/* Vercel Analytics */}
+        <Analytics />
       </body>
     </html>
   );
