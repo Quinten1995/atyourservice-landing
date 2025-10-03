@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
-import { Analytics } from "@vercel/analytics/react"; // 👈 hinzugefügt
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -37,14 +37,10 @@ export const metadata: Metadata = {
     canonical: "/",
     languages: {
       de: "/",
-      nl: "/?lang=nl", // später auf echte /nl-Route umstellen
+      nl: "/?lang=nl",
     },
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true },
-  },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   openGraph: {
     type: "website",
     url: base,
@@ -54,7 +50,7 @@ export const metadata: Metadata = {
       "Kunden & Dienstleister direkt verbinden – ohne Provision. Fair, schnell & lokal. iOS & Android.",
     images: [
       {
-        url: "/og.jpg", // optional: 1200x630 unter /public/og.jpg
+        url: "/og.jpg", // 1200x630 in /public/og.jpg (optional)
         width: 1200,
         height: 630,
         alt: "AtYourService App",
@@ -64,14 +60,23 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "AtYourService – Jobs in deiner Nähe. 0% Provision.",
-    description:
-      "Kunden & Dienstleister ohne Provisionen – fair, schnell und lokal.",
+    description: "Kunden & Dienstleister ohne Provisionen – fair, schnell und lokal.",
     images: ["/og.jpg"],
   },
+
+  // ✅ Favicons & Touch-Icons
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png", // optional, falls vorhanden
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      "/favicon.ico",
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
+
+  // ✅ PWA Manifest + Browser-Farbleiste
+  manifest: "/site.webmanifest",
+  themeColor: "#0f766e", // nimm hier gern deine Markenfarbe
 };
 
 export default function RootLayout({
@@ -82,7 +87,7 @@ export default function RootLayout({
     "@type": "Organization",
     name: "AtYourService",
     url: base,
-    logo: `${base}/favicon.ico`,
+    logo: `${base}/android-chrome-512x512.png`, // besseres Logo als .ico
     sameAs: [store.android, store.ios],
   };
 
@@ -102,7 +107,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
 
-        {/* JSON-LD für Rich Results */}
+        {/* JSON-LD */}
         <Script id="ld-org" type="application/ld+json" strategy="afterInteractive">
           {JSON.stringify(orgLd)}
         </Script>
@@ -110,7 +115,6 @@ export default function RootLayout({
           {JSON.stringify(appLd)}
         </Script>
 
-        {/* Vercel Analytics */}
         <Analytics />
       </body>
     </html>
