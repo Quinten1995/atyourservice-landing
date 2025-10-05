@@ -286,7 +286,6 @@ export default function Home() {
   const openApp = (plan: 'free' | 'silber' | 'gold') => {
     const schemeUrl = `atyourservice://subscribe?plan=${encodeURIComponent(plan)}`;
     const isIOS = /iPad|iPhone|iPod/i.test(navigator.userAgent);
-    const isAndroid = /Android/i.test(navigator.userAgent);
     const storeUrl = isIOS ? store.ios : store.android;
 
     const started = Date.now();
