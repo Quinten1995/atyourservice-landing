@@ -38,6 +38,7 @@ export const metadata: Metadata = {
     languages: {
       de: "/",
       nl: "/?lang=nl",
+      en: "/?lang=en",
     },
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },

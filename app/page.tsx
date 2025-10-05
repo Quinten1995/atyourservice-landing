@@ -141,9 +141,63 @@ const t = {
     btn_join_as_pro: 'Inschrijven als vakman',
     btn_join_as_customer: 'Inschrijven als klant',
   },
+  en: {
+    nav_features: 'Features',
+    nav_pricing: 'Pricing',
+    nav_faq: 'FAQ',
+    nav_join: 'I am a provider',
+    badge: '0% commission',
+    hero_title: 'Jobs near you. Instantly.',
+    hero_sub:
+      'AtYourService connects customers and providers with 0% commissions – fair, fast, and local.',
+    cta_customer: 'I need help',
+    cta_pro: 'I am a provider',
+    store_badge: 'Available on the App Store & Google Play',
+    why_title: 'Why AtYourService?',
+    why: [
+      ['Radius view', 'Only see jobs within your working area – filtered by distance.'],
+      ['Instant push', 'New jobs nearby? Get a push notification immediately.'],
+      ['Direct contact', 'We connect customer ↔ provider. You agree on price & payment directly.'],
+      ['No commissions', '0% fees. No hidden costs – fair and transparent.'],
+      ['7 languages', 'The app adapts to your device language automatically.'],
+      ['First come, first served', 'React first → best chance – simple & fair.'],
+    ] as WhyItem[],
+    note_title: 'Launch note',
+    note_body:
+      'We roll out cities in phases. At first you may see few jobs – this will grow quickly.',
+    pricing_title: 'Pricing',
+    plans: [
+      ['Free', '€0', 'forever', ['See jobs in your radius', 'Push for new jobs', 'Basic profile']],
+      ['Silver', '€9.99', 'month', ['Extended radius', 'Higher visibility', 'Faster notifications']],
+      ['Gold', '€19.99', 'month', ['Max radius & priority', 'Top placements', 'Premium support']],
+    ] as PlanItem[],
+    faq_title: 'FAQ',
+    faqs: [
+      ['Any commissions?', 'No. We take 0% – you agree price & payment directly with the customer.'],
+      ['How do I get jobs?', 'Push notifications for new jobs in your radius. First to react = best chance.'],
+      ['When does my city start?', 'Phased rollout. Join the list – we’ll notify you once live.'],
+    ] as FaqItem[],
+    join_title: 'Want early access?',
+    join_body:
+      'Join the waiting list if you are a provider – the subscription is for providers only (customers use the app for free).',
+    join_cta: 'Join the waitlist',
+    footer_rights: 'All rights reserved',
+    footer_imprint: 'Imprint',
+    footer_privacy: 'Privacy',
+    footer_terms: 'Terms',
+    note_sub: 'Note: The subscription is for providers; customers do not need a subscription.',
+    role_customer: 'Customer',
+    role_pro: 'Provider',
+    btn_join_as_pro: 'Join as provider',
+    btn_join_as_customer: 'Join as customer',
+  },
 } as const;
 
 type Lang = keyof typeof t;
+
+// Sichtbare Kontakt-Mail (Footer)
+const SUPPORT_EMAIL = 'info@atyourservice24.eu';
+const MAILTO = `mailto:${SUPPORT_EMAIL}?subject=AtYourService%20Anfrage`;
 
 /* ---------- Slider (Crossfade) ---------- */
 function ScreenshotSlider({ shots }: { shots: { src: string; alt: string }[] }) {
@@ -303,10 +357,11 @@ export default function Home() {
               value={lang}
               onChange={(e) => setLang(e.target.value as Lang)}
               className="ml-2 rounded-lg border px-2 py-1 bg-white"
-              aria-label="Sprache / Taal"
+              aria-label="Sprache / Taal / Language"
             >
               <option value="de">DE</option>
               <option value="nl">NL</option>
+              <option value="en">EN</option>
             </select>
           </nav>
         </div>
@@ -355,7 +410,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 rounded-xl border bg-white/80 backdrop-blur px-3 py-2 hover:bg-white"
-                aria-label={lang === 'de' ? 'Im App Store öffnen' : 'Open in App Store'}
+                aria-label={lang === 'de' ? 'Im App Store öffnen' : lang === 'nl' ? 'Open in App Store' : 'Open in App Store'}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" className="opacity-80 group-hover:opacity-100" aria-hidden="true">
                   <path fill="currentColor" d="M16.365 1.43c.02 1.18-.43 2.16-1.12 2.96-.74.84-1.94 1.48-3.12 1.4-.14-1.14.47-2.34 1.17-3.06.77-.8 2.05-1.39 3.07-1.3zM21 17.38c-.4.94-.88 1.77-1.43 2.49-.74.98-1.36 1.66-2.05 2.12-.79.49-1.64.74-2.55.75-.98.01-1.62-.23-2.23-.47-.53-.21-1.03-.41-1.58-.41-.58 0-1.1.2-1.65.41-.6.24-1.24.49-2.15.47-.92-.02-1.79-.32-2.6-.83-.74-.47-1.42-1.14-2.04-2.02C1.78 18.5.98 16.4 1 14.42c.01-1.26.29-2.49.83-3.58.53-1.07 1.27-1.94 2.22-2.6.83-.57 1.73-.88 2.68-.9.88-.02 1.62.25 2.2.5.51.21.96.39 1.34.39.35 0 .79-.17 1.31-.38.7-.28 1.5-.6 2.53-.53.93.04 1.78.34 2.55.9-.95.57-1.67 1.35-2.17 2.32-.53 1.02-.79 2.1-.8 3.23.01 1.27.35 2.32.92 3.17.56.84 1.31 1.43 2.23 1.75.22.08.46.14.7.2z"/>
@@ -367,7 +422,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 rounded-xl border bg-white/80 backdrop-blur px-3 py-2 hover:bg-white"
-                aria-label={lang === 'de' ? 'In Google Play öffnen' : 'Open in Google Play'}
+                aria-label={lang === 'de' ? 'In Google Play öffnen' : lang === 'nl' ? 'Open in Google Play' : 'Open in Google Play'}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" className="opacity-80 group-hover:opacity-100" aria-hidden="true">
                   <path fill="currentColor" d="M3.6 2.2l11.7 9.05c.3.23.3.68 0 .91L3.6 21.2c-.43.33-1.05.02-1.05-.46V2.66c0-.48.62-.79 1.05-.46zm13.5 6.1l3.38-2.63c.34-.26.82-.02.82.4v11.86c0 .42-.48.67-.82.4l-3.38-2.63-3.1-2.4a.6.6 0 010-.96l3.1-2.08z"/>
@@ -449,9 +504,10 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => {
+                  const nameLc = name.toLowerCase();
                   const planKey =
-                    name.toLowerCase().includes('silber') || name.toLowerCase().includes('zilver') ? 'silber' :
-                    name.toLowerCase().includes('gold')   || name.toLowerCase().includes('goud')   ? 'gold'   :
+                    nameLc.includes('silber') || nameLc.includes('zilver') || nameLc.includes('silver') ? 'silber' :
+                    nameLc.includes('gold')   || nameLc.includes('goud')   ? 'gold'   :
                     'free';
 
                   if (planKey === 'free') {
@@ -504,7 +560,13 @@ export default function Home() {
             id="email"
             name="email"
             type="email"
-            placeholder={lang === 'de' ? 'dein@email.com' : 'jouw@email.com'}
+            placeholder={
+              lang === 'de'
+                ? 'dein@email.com'
+                : lang === 'nl'
+                  ? 'jouw@email.com'
+                  : 'your@email.com'
+            }
             className="h-11 rounded-xl border px-3"
             required
           />
@@ -514,7 +576,7 @@ export default function Home() {
             disabled={submitting}
           >
             {submitting
-              ? 'Wird gesendet…'
+              ? (lang === 'de' ? 'Wird gesendet…' : lang === 'nl' ? 'Wordt verzonden…' : 'Sending…')
               : role === 'pro'
                 ? tr.btn_join_as_pro
                 : role === 'customer'
@@ -528,7 +590,15 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer className="border-t mt-8">
-        <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-slate-500 flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* sichtbare Kontaktzeile */}
+        <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-slate-700 flex flex-col gap-2 items-center text-center">
+          <p>
+            Fragen? / Vragen? / Questions?{' '}
+            <a href={MAILTO} className="underline">{SUPPORT_EMAIL}</a>
+          </p>
+        </div>
+
+        <div className="mx-auto max-w-6xl px-4 pb-10 text-sm text-slate-500 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>© {new Date().getFullYear()} AtYourService • {tr.footer_rights}</div>
           <div className="flex gap-4">
             <a className="hover:underline" href="#">{tr.footer_imprint}</a>
