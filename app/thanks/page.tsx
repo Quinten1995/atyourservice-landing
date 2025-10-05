@@ -96,9 +96,11 @@ export default function Thanks({ searchParams }: ThanksProps) {
   const roleRaw = getFirst(searchParams?.role);
   const langRaw = (getFirst(searchParams?.lang) || "de").toLowerCase();
 
-  const lang = (["de", "nl", "en"] as const).includes(langRaw as any)
-    ? (langRaw as "de" | "nl" | "en")
-    : "de";
+  // Typ-Guard statt any
+  function isLang(x: string): x is "de" | "nl" | "en" {
+    return x === "de" || x === "nl" || x === "en";
+  }
+  const lang: "de" | "nl" | "en" = isLang(langRaw) ? langRaw : "de";
 
   const tr = t[lang];
 
