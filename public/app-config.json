@@ -1,0 +1,11 @@
+{
+  "minSupported": "1.0.0",
+  "latest": "1.0.0",
+  "store": {
+    "android": "market://details?id=com.quinten.atyourservice",
+    "android_web": "https://play.google.com/store/apps/details?id=com.quinten.atyourservice",
+    "ios": "itms-apps://itunes.apple.com/app/id6748581941",
+    "ios_web": "https://apps.apple.com/app/id6748581941"
+  },
+  "message": "Neue Version mit Verbesserungen verfügbar."
+}

@@ -1,15 +1,22 @@
-// next.config.ts (oder next.config.js)
+// next.config.ts
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   async redirects() {
     return [
-      // /de und /de/ immer auf die Startseite
       { source: '/de',  destination: '/', permanent: true },
       { source: '/de/', destination: '/', permanent: true },
     ];
   },
-  // Falls du i18n nutzt, vermeide Auto-Redirects für Bots
+  async headers() {
+    return [
+      {
+        source: '/app-config.json',
+        headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }],
+      },
+    ];
+  },
+  // Optional – nur falls du i18n nutzt:
   // i18n: {
   //   locales: ['de'],
   //   defaultLocale: 'de',
